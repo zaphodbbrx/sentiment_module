@@ -1,0 +1,8 @@
+{
+"reg_power":1e-8,
+"max_length":100,
+"n_features":78,
+"cv_path":"aux/cv.pkl",
+"weights_path":"aux/cnn_small.hdf5",
+"proba_threshold":0.5
+}
