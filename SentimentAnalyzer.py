@@ -80,28 +80,25 @@ class SentimentAnalyzer():
         self.model.load_weights(self.weights_path)
 
     def run(self,text):
-        text = self.__clean_tweet(str(text).lower())
-        seqs, _ = self.__make_padded_sequences([text], self.max_length, self.cv)
+        text = [self.__clean_tweet(str(t).lower()) for t in text]
+        seqs, _ = self.__make_padded_sequences(text, self.max_length, self.cv)
         proba = self.model.predict(seqs)
-        if proba>self.proba_threshold:
-            return {
-                'decision':'positive',
-                'confidence':proba
-            }
-        else:
-            return {
-                'decision':'negative',
-                'confidence':1-proba
-            }
+        decisions = ['positive' if p>self.proba_threshold else 'negative' for p in proba]
+        probas = [p[0] if p>self.proba_threshold else 1-p[0] for p in proba]
+        return {
+            'decision':decisions,
+            'confidence':probas
+        }
 
 
 
 if __name__ == '__main__':
     sa = SentimentAnalyzer('config.json')
-    mes = ''
-    while True:
-        mes = input()
-        if mes == 'q':
-            break
-        print(sa.run(mes))
+    test_mes = [
+        'new definition of #hodl',
+        'How can I trust you to keep my coins and not send them back. Scam!',
+        'I just logged in through the app (couldn’t yesterday). All my stuff is fine. Obviously you don’t have to trust me but I’m not posting a screenshot from my phone right now. Hope it assuages some concern',
+        'Was really hoping to buy #TRX at .03 last night hope that price holds or I\'m gng to be pretty pissed at u guys.'
+    ]
+    print(sa.run(test_mes))
 
